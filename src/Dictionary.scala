@@ -1,5 +1,7 @@
 import scala.io.Source
 import scala.collection.mutable.Stack
+import java.io.FileNotFoundException
+import java.lang.NumberFormatException
 class Node{
 	var rank=0;
 	var terminal=0;
@@ -7,14 +9,27 @@ class Node{
 }
 class Trie{
 	val root=new Node()
+	var flag=false
 	def this(args: Array[String]){
 		this()
 		for(filename <- args){
-			for(line <- Source.fromFile(filename).getLines()){
-				for(word <- line.stripLineEnd.split(' '))
-					this.addWord(word)
+			try{
+				for(line <- Source.fromFile(filename).getLines()){
+					for(word <- line.stripLineEnd.split(' '))
+						this.addWord(word)
+				}
+				println("\nFile "+filename+" has Loaded Successfully in the Dictionary")
+				flag=true
 			}
-			println("\nFile "+filename+" has Loaded Successfully in the Dictionary")
+			catch{
+				case ex: FileNotFoundException =>{
+					println("File "+filename+" is Missing")
+				}
+			}
+		}
+		if(flag==false){
+			println("Program Will Exit Now!!!")
+			System.exit(-1)
 		}
 	}
 	def addWord(word: String):Unit={
@@ -81,10 +96,18 @@ class Trie{
 	}
 }
 object Dictionary{
-	def main(args:Array[String]){
+	def main(args:Array[String]):Unit={
 		val t1=new Trie(args)
+		var noOfWords=10
 		println("\nEnter Number of Predictions Required:")
-		var noOfWords=(Console.readLine()).toInt
+		try{
+			noOfWords=(Console.readLine()).toInt
+		}
+		catch{
+			case ex: NumberFormatException => {
+            println("Invalid Input, Default value is Considered")
+         }
+		}
 		println("\nEnter a Word to be Searched from the Dictionary")
 		var x=Console.readLine()
 		while(x.toLowerCase!="end" && x!="")
