@@ -1,6 +1,5 @@
 import scala.io.Source
 import scala.collection.mutable.Stack
-import scala.collection.mutable.Set
 class Node{
 	var rank=0;
 	var terminal=0;
@@ -39,8 +38,8 @@ class Trie{
 		return false
 		return true
 	}
-	def prediction(word: String,num :Int):Set[String]={
-		var list=Set(word)
+	def prediction(word: String,num :Int):Seq[String]={
+		var list=Stack[String]()
 		var noOfWords=num
 		predictWord(word)
 		def predictWord(word: String):Unit={
@@ -51,19 +50,20 @@ class Trie{
 				else
 					return
 			}
+			//println(word)
 			traversal(temp,list,word)
 		}
-		def traversal(temp: Node,list: Set[String],word: String):Unit={
+		def traversal(temp: Node,list: Stack[String],word: String):Unit={
 			if(noOfWords>0){
-				for(x <- sort(temp)){
-					val key=x
+				for(ch <- sort(temp)){
 					//println(word+":"+key)
 					if(temp.terminal==1){
-						list+=word
+						//println("test:"+ch+":"+word+":"+temp.rank)
+						list.push(word)
 						//println(word)
 						noOfWords-=1
 					}
-					traversal(temp.link(key),list,word+key)	
+					traversal(temp.link(ch),list,word+ch)	
 				}
 			}
 		}
@@ -77,7 +77,7 @@ class Trie{
 			data=data.reverse
 			return data
 		}
-		return list
+		return list.reverse.seq.distinct
 	}
 }
 object Dictionary{
@@ -93,6 +93,7 @@ object Dictionary{
 				println("Search Successful : "+x+" is Found")
 			else
 				println("Search Unsuccessful :"+x+" is not Found")
+			println("Predictions :")
 			(t1.prediction(x,noOfWords)).foreach(x => if(x!=null)println(x))
 			println("\nEnter a Word to be Searched from the Dictionary")
 			x=Console.readLine()
